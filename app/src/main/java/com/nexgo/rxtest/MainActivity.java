@@ -55,26 +55,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onTimeout(View view) {
-        Observable.timer(3, TimeUnit.SECONDS)
+        testTimer();
+    }
+
+    private Observable<Long> testTimer() {
+        log.debug("timer start!");
+        Observable<Long> obs = Observable.timer(6, TimeUnit.SECONDS)
+                //set timeout
+                .timeout(5, TimeUnit.SECONDS)
+                        //set retry
+                .retry(1)
                 .subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Action1<Long>() {
-                               @Override
-                               public void call(final Long aLong) {
-                                   log.debug("timer up {}.", aLong);
-                               }
-                           },
-                        new Action1<Throwable>() {
-                            @Override
-                            public void call(final Throwable throwable) {
-                                log.debug("timer error:", throwable);
-                            }
-                        },
-                        new Action0() {
-                            @Override
-                            public void call() {
-                                log.debug("timer complete");
-                            }
-                        });
+                .observeOn(AndroidSchedulers.mainThread());
+
+// 这样才有效，每次build之后的实例不一样
+//        obs = obs.timeout(5, TimeUnit.SECONDS);
+
+        obs.subscribe(new Action1<Long>() {
+                          @Override
+                          public void call(final Long aLong) {
+                              log.debug("timer up {}.", aLong);
+                          }
+                      },
+                new Action1<Throwable>() {
+                    @Override
+                    public void call(final Throwable throwable) {
+                        log.debug("timer error:", throwable);
+                    }
+                },
+                new Action0() {
+                    @Override
+                    public void call() {
+                        log.debug("timer complete");
+                    }
+                });
+        return obs;
     }
 }
