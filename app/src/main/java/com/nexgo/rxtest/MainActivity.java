@@ -68,9 +68,6 @@ public class MainActivity extends AppCompatActivity {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread());
 
-// 这样才有效，每次build之后的实例不一样
-//        obs = obs.timeout(5, TimeUnit.SECONDS);
-
         obs.subscribe(new Action1<Long>() {
                           @Override
                           public void call(final Long aLong) {
